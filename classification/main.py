@@ -36,8 +36,8 @@ import utils
 def get_args_parser():
     parser = argparse.ArgumentParser(
         'Cascaded-ViT Training and evaluation script', add_help=False)
-    parser.add_argument('--batch-size', default=256, type=int)
-    parser.add_argument('--epochs', default=100, type=int)
+    parser.add_argument('--batch-size', default=3072, type=int)
+    parser.add_argument('--epochs', default=300, type=int)
 
     # Model parameters
     parser.add_argument('--model', default='CascadedViT_M', type=str, metavar='MODEL',
@@ -67,14 +67,14 @@ def get_args_parser():
                         help='Gradient clipping mode. One of ("norm", "value", "agc")')
     parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                         help='SGD momentum (default: 0.9)')
-    parser.add_argument('--weight-decay', type=float, default=0.025,
-                        help='weight decay (default: 0.025)')
+    parser.add_argument('--weight-decay', type=float, default=0.0125,
+                        help='weight decay (default: 0.0125)')
 
     # Learning rate schedule parameters
     parser.add_argument('--sched', default='cosine', type=str, metavar='SCHEDULER',
                         help='LR scheduler (default: "cosine"')
-    parser.add_argument('--lr', type=float, default=1e-3, metavar='LR',
-                        help='learning rate (default: 1e-3)')
+    parser.add_argument('--lr', type=float, default=9e-4, metavar='LR',
+                        help='learning rate (default: 9e-4)')
     parser.add_argument('--lr-noise', type=float, nargs='+', default=None, metavar='pct, pct',
                         help='learning rate noise on/off epoch percentages')
     parser.add_argument('--lr-noise-pct', type=float, default=0.67, metavar='PERCENT',
@@ -83,8 +83,8 @@ def get_args_parser():
                         help='learning rate noise std-dev (default: 1.0)')
     parser.add_argument('--warmup-lr', type=float, default=1e-6, metavar='LR',
                         help='warmup learning rate (default: 1e-6)')
-    parser.add_argument('--min-lr', type=float, default=1e-5, metavar='LR',
-                        help='lower lr bound for cyclic schedulers that hit 0 (1e-5)')
+    parser.add_argument('--min-lr', type=float, default=1e-4, metavar='LR',
+                        help='lower lr bound for cyclic schedulers that hit 0 (1e-4)')
     parser.add_argument('--decay-epochs', type=float, default=30, metavar='N',
                         help='epoch interval to decay LR')
     parser.add_argument('--warmup-epochs', type=int, default=5, metavar='N',
@@ -123,9 +123,9 @@ def get_args_parser():
                         help='Do not random erase first (clean) augmentation split')
 
     # Mixup params
-    parser.add_argument('--mixup', type=float, default=0.8,
+    parser.add_argument('--mixup', type=float, default=0.6,
                         help='mixup alpha, mixup enabled if > 0. (default: 0.8)')
-    parser.add_argument('--cutmix', type=float, default=1.0,
+    parser.add_argument('--cutmix', type=float, default=0.8,
                         help='cutmix alpha, cutmix enabled if > 0. (default: 1.0)')
     parser.add_argument('--cutmix-minmax', type=float, nargs='+', default=None,
                         help='cutmix min/max ratio, overrides alpha and enables cutmix if set (default: None)')
@@ -154,7 +154,7 @@ def get_args_parser():
                         help='set BN layers to eval mode during finetuning.')
 
     # Dataset parameters
-    parser.add_argument('--data-path', default='/root/FastBaseline/data/imagenet', type=str,
+    parser.add_argument('--data-path', default='/datasets', type=str,
                         help='dataset path')
     parser.add_argument('--data-set', default='IMNET', choices=['CIFAR', 'IMNET', 'INAT', 'INAT19'],
                         type=str, help='Image Net dataset path')
