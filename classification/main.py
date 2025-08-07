@@ -61,9 +61,9 @@ def get_args_parser():
                         help='Optimizer Epsilon (default: 1e-8)')
     parser.add_argument('--opt-betas', default=None, type=float, nargs='+', metavar='BETA',
                         help='Optimizer Betas (default: None, use opt default)')
-    parser.add_argument('--clip-grad', type=float, default=0.02, metavar='NORM',
+    parser.add_argument('--clip-grad', type=float, default=0.015, metavar='NORM',
                         help='Clip gradient norm (default: None, no clipping)')
-    parser.add_argument('--clip-mode', type=str, default='agc',
+    parser.add_argument('--clip-mode', type=str, default='norm',
                         help='Gradient clipping mode. One of ("norm", "value", "agc")')
     parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                         help='SGD momentum (default: 0.9)')
