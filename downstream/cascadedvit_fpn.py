@@ -1,10 +1,9 @@
 # --------------------------------------------------------
-# EfficientViT FPN Architecture for Downstream Tasks
-# Copyright (c) 2022 Microsoft
-# Adapted from mmdetection FPN and LightViT
+# CascadedViT FPN Architecture for Downstream Tasks
+# Adapted from mmdetection FPN, LightViT and EfficientViT
 #   mmdetection: (https://github.com/open-mmlab/mmdetection)
 #   LightViT: (https://github.com/hunto/LightViT)
-# Written by: Xinyu Liu
+#   EfficientViT: (https://github.com/microsoft/Cream/tree/main/EfficientViT)
 # --------------------------------------------------------
 import warnings
 
@@ -17,8 +16,8 @@ from mmdet.models.builder import NECKS
 
 
 @NECKS.register_module()
-class EfficientViTFPN(nn.Module):
-    r"""Feature Pyramid Network for EfficientViT.
+class CascadedViTFPN(nn.Module):
+    r"""Feature Pyramid Network for CascadedViT.
     Args:
         in_channels (List[int]): Number of input channels per scale.
         out_channels (int): Number of output channels (used at each scale)
@@ -68,7 +67,7 @@ class EfficientViTFPN(nn.Module):
                  norm_cfg=None,
                  act_cfg=None,
                  upsample_cfg=dict(mode='nearest')):
-        super(EfficientViTFPN, self).__init__()
+        super(CascadedViTFPN, self).__init__()
         assert isinstance(in_channels, list)
         self.in_channels = in_channels
         self.out_channels = out_channels

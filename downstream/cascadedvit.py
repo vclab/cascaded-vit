@@ -1,8 +1,3 @@
-# --------------------------------------------------------
-# EfficientViT Model Architecture for Downstream Tasks
-# Copyright (c) 2022 Microsoft
-# Written by: Xinyu Liu
-# --------------------------------------------------------
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -19,6 +14,7 @@ from mmcv_custom import load_checkpoint, _load_checkpoint, load_state_dict
 from mmdet.utils import get_root_logger
 from mmdet.models.builder import BACKBONES
 from torch.nn.modules.batchnorm import _BatchNorm
+
 
 class Conv2d_BN(torch.nn.Sequential):
     def __init__(self, a, b, ks=1, stride=1, pad=0, dilation=1,
@@ -69,6 +65,15 @@ class BN_Linear(torch.nn.Sequential):
         m.bias.data.copy_(b)
         return m
 
+def replace_batchnorm(net):
+    for child_name, child in net.named_children():
+        if hasattr(child, 'fuse'):
+            setattr(net, child_name, child.fuse())
+        elif isinstance(child, torch.nn.BatchNorm2d):
+            setattr(net, child_name, torch.nn.Identity())
+        else:
+            replace_batchnorm(child)
+            
 
 class PatchMerging(torch.nn.Module):
     def __init__(self, dim, out_dim, input_resolution):
@@ -109,7 +114,7 @@ class FFN(torch.nn.Module):
     def forward(self, x):
         x = self.pw2(self.act(self.pw1(x)))
         return x
-    
+
 class CFFN(torch.nn.Module):
     def __init__(self, ed: int, h: int, resolution: int, num_chunks: int = 2):
         super().__init__()
@@ -142,6 +147,7 @@ class CFFN(torch.nn.Module):
         
         # concatenate outputs along channel dim
         return torch.cat(out_chunks, dim=1)
+
 
 class CascadedGroupAttention(torch.nn.Module):
     r""" Cascaded Group Attention.
@@ -247,17 +253,13 @@ class LocalWindowAttention(torch.nn.Module):
         assert window_resolution > 0, 'window_size must be greater than 0'
         self.window_resolution = window_resolution
         
-        window_resolution = min(window_resolution, resolution)
         self.attn = CascadedGroupAttention(dim, key_dim, num_heads,
                                 attn_ratio=attn_ratio, 
                                 resolution=window_resolution,
                                 kernels=kernels,)
 
     def forward(self, x):
-        H = W = self.resolution
-        B, C, H_, W_ = x.shape
-        # Only check this for classifcation models
-        assert H == H_ and W == W_, 'input feature has wrong size, expect {}, got {}'.format((H, W), (H_, W_))
+        B, C, H, W = x.shape
                
         if H <= self.window_resolution and W <= self.window_resolution:
             x = self.attn(x)
@@ -283,14 +285,17 @@ class LocalWindowAttention(torch.nn.Module):
             # window reverse, (BnHnW)Chw -> (BnHnW)hwC -> BnHnWhwC -> B(nHh)(nWw)C -> BHWC
             x = x.permute(0, 2, 3, 1).view(B, nH, nW, self.window_resolution, self.window_resolution,
                        C).transpose(2, 3).reshape(B, pH, pW, C)
+
             if padding:
                 x = x[:, :H, :W].contiguous()
+
             x = x.permute(0, 3, 1, 2)
+
         return x
 
 
-class EfficientViTBlock(torch.nn.Module):    
-    """ A basic EfficientViT building block.
+class CascadedViTBlock(torch.nn.Module):
+    """ A basic CascadedViT building block.
 
     Args:
         type (str): Type for token mixer. Default: 's' for self-attention.
@@ -323,7 +328,8 @@ class EfficientViTBlock(torch.nn.Module):
     def forward(self, x):
         return self.ffn1(self.dw1(self.mixer(self.ffn0(self.dw0(x)))))
 
-class EfficientViT(torch.nn.Module):
+
+class CascadedViT(torch.nn.Module):
     def __init__(self, img_size=400,
                  patch_size=16,
                  frozen_stages=0,
@@ -354,7 +360,7 @@ class EfficientViT(torch.nn.Module):
         for i, (stg, ed, kd, dpth, nh, ar, wd, do) in enumerate(
                 zip(stages, embed_dim, key_dim, depth, num_heads, attn_ratio, window_size, down_ops)):
             for d in range(dpth):
-                eval('self.blocks' + str(i+1)).append(EfficientViTBlock(stg, ed, kd, nh, ar, resolution, wd, kernels))
+                eval('self.blocks' + str(i+1)).append(CascadedViTBlock(stg, ed, kd, nh, ar, resolution, wd, kernels))
             if do[0] == 'subsample':
                 #('Subsample' stride)
                 blk = eval('self.blocks' + str(i+2))
@@ -445,7 +451,7 @@ class EfficientViT(torch.nn.Module):
 
     def train(self, mode=True):
         """Convert the model into training mode while keep layers freezed."""
-        super(EfficientViT, self).train(mode)
+        super(CascadedViT, self).train(mode)
         self._freeze_stages()
         if mode:
             for m in self.modules():
@@ -463,7 +469,7 @@ class EfficientViT(torch.nn.Module):
         outs.append(x)
         return tuple(outs)
 
-EfficientViT_m0 = {
+CascadedViT_S = {
         'img_size': 224,
         'patch_size': 16,
         'embed_dim': [64, 128, 192],
@@ -473,17 +479,7 @@ EfficientViT_m0 = {
         'kernels': [7, 5, 3, 3],
     }
 
-EfficientViT_m1 = {
-        'img_size': 224,
-        'patch_size': 16,
-        'embed_dim': [128, 144, 192],
-        'depth': [1, 2, 3],
-        'num_heads': [2, 3, 3],
-        'window_size': [7, 7, 7],
-        'kernels': [7, 5, 3, 3],
-    }
-
-EfficientViT_m2 = {
+CascadedViT_M = {
         'img_size': 224,
         'patch_size': 16,
         'embed_dim': [128, 192, 224],
@@ -493,17 +489,7 @@ EfficientViT_m2 = {
         'kernels': [7, 5, 3, 3],
     }
 
-EfficientViT_m3 = {
-        'img_size': 224,
-        'patch_size': 16,
-        'embed_dim': [128, 240, 320],
-        'depth': [1, 2, 3],
-        'num_heads': [4, 3, 4],
-        'window_size': [7, 7, 7],
-        'kernels': [5, 5, 5, 5],
-    }
-
-EfficientViT_m4 = {
+CascadedViT_L = {
         'img_size': 224,
         'patch_size': 16,
         'embed_dim': [128, 256, 384],
@@ -513,7 +499,7 @@ EfficientViT_m4 = {
         'kernels': [7, 5, 3, 3],
     }
 
-EfficientViT_m5 = {
+CascadedViT_XL = {
         'img_size': 224,
         'patch_size': 16,
         'embed_dim': [192, 288, 384],
@@ -524,43 +510,30 @@ EfficientViT_m5 = {
     }
 
 @BACKBONES.register_module()
-def EfficientViT_M0(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=EfficientViT_m0):
-    model = EfficientViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
+def CascadedViT_S(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_S):
+    model = CascadedViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
     if fuse:
         replace_batchnorm(model)
     return model
 
-@BACKBONES.register_module()
-def EfficientViT_M1(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=EfficientViT_m1):
-    model = EfficientViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
-    if fuse:
-        replace_batchnorm(model)
-    return model
 
 @BACKBONES.register_module()
-def EfficientViT_M2(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=EfficientViT_m2):
-    model = EfficientViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
-    if fuse:
-        replace_batchnorm(model)
-    return model
-
-@BACKBONES.register_module()
-def EfficientViT_M3(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=EfficientViT_m3):
-    model = EfficientViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
+def CascadedViT_M(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_M):
+    model = CascadedViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
     if fuse:
         replace_batchnorm(model)
     return model
     
 @BACKBONES.register_module()
-def EfficientViT_M4(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=EfficientViT_m4):
-    model = EfficientViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
+def CascadedViT_L(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_L):
+    model = CascadedViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
     if fuse:
         replace_batchnorm(model)
     return model
 
 @BACKBONES.register_module()
-def EfficientViT_M5(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=EfficientViT_m5):
-    model = EfficientViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
+def CascadedViT_XL(pretrained=False, frozen_stages=0, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_XL):
+    model = CascadedViT(frozen_stages=frozen_stages, distillation=distillation, pretrained=pretrained, **model_cfg)
     if fuse:
         replace_batchnorm(model)
     return model

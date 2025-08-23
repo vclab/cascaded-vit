@@ -1,5 +1,5 @@
 _base_ = [
-    './_base_/models/mask_rcnn_efficientvit_fpn.py',
+    './_base_/models/mask_rcnn_cascadedvit_fpn.py',
     './_base_/datasets/coco_instance.py',
     './_base_/schedules/schedule_1x.py',
     './_base_/default_runtime.py'
@@ -8,12 +8,12 @@ _base_ = [
 model = dict(
     pretrained=None,
     backbone=dict(        
-        type='EfficientViT_M4',
-        pretrained="/root/efficientvit_m4.pth",
+        type='CascadedViT_L',
+        pretrained="CascadedViT_L.pth",
         frozen_stages=-1,
         ),
     neck=dict(
-        type='EfficientViTFPN',
+        type='CascadedViTFPN',
         in_channels=[128, 256, 384],
         out_channels=256,
         start_level=0,
@@ -22,7 +22,7 @@ model = dict(
         ))
 
 # optimizer
-optimizer = dict(_delete_=True, type='AdamW', lr=0.0001, betas=(0.9, 0.999), weight_decay=0.05,
+optimizer = dict(_delete_=True, type='AdamW', lr=0.00015, betas=(0.9, 0.999), weight_decay=0.025,
                  paramwise_cfg=dict(custom_keys={'attention_biases': dict(decay_mult=0.),
                                                  'attention_bias_idxs': dict(decay_mult=0.),
                                                  }))
