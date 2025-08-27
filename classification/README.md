@@ -11,10 +11,10 @@ This document outlines the results and steps to run classification experiments u
 
 | Model Name     | Top-1 (%) | Params (M) | FLOPs (M) | Throughput (img/s)<br>GPU / M4 Pro / RyzenAI | Energy (J/Img)<br>on M4 Pro | Weights |
 |----------------|-----------|------------|-----------|----------------------------------------------|------------------------------|---------|
-| CascadedViT-S  | 62.0      | 1.9        | 67        | 25740 / 5775 / 1453                          | 471                          | [CascadedViT_S](https://github.com/vclab/cascaded-vit/releases/download/v1.0/CascadedViT_S.pth) |
-| CascadedViT-M  | 69.9      | 3.5        | 173       | 20464 / 3717 / 867                           | 568                          | [CascadedViT_M](https://github.com/vclab/cascaded-vit/releases/download/v1.0/CascadedViT_M.pth) |
-| CascadedViT-L  | 73.0      | 7.0        | 249       | 17335 / 2978 / 667                           | 588                          | [CascadedViT_L](https://github.com/vclab/cascaded-vit/releases/download/v1.0/CascadedViT_L.pth) |
-| CascadedViT-XL | 75.5      | 9.8        | 366       | 11934 / 1910 / 423                           | 653                          | [CascadedViT_XL](https://github.com/vclab/cascaded-vit/releases/download/v1.0/CascadedViT_XL.pth) |
+| CascadedViT-S  | 62.0      | 1.9        | 67        | 25740 / 5775 / 1453                          | 471                          | [cascadedvit_s](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_s.pth) |
+| CascadedViT-M  | 69.9      | 3.5        | 173       | 20464 / 3717 / 867                           | 568                          | [cascadedvit_m](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_m.pth) |
+| CascadedViT-L  | 73.0      | 7.0        | 249       | 17335 / 2978 / 667                           | 588                          | [cascadedvit_l](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_l.pth) |
+| CascadedViT-XL | 75.5      | 9.8        | 366       | 11934 / 1910 / 423                           | 653                          | [cascadedvit_xl](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_xl.pth) |
 
 ## Requirements 
 
@@ -122,7 +122,7 @@ To train CascadedViT_L student, download the weights for CascadedViT_XL teacher 
 <summary>CascadedViT_S</summary>
 
 ```
-python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_env main.py --model CascadedViT_S --batch-size 3072 --num_workers 48 --data-path path/to/ImageNet --output_dir path/to/save/checkpoints --epochs 300  --lr 9e-4 --weight-decay 0.0125 --clip-grad 0.025  --clip-mode 'norm' --min-lr 9e-5 --distillation-type soft --teacher-model 'CascadedViT_L' --teacher-path path/to/CascadedViT_L.pth --mixup 0.1 --cutmix 0.1 --distillation-alpha 0.5 --distillation-tau 2.0
+python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_env main.py --model CascadedViT_S --batch-size 3072 --num_workers 48 --data-path path/to/ImageNet --output_dir path/to/save/checkpoints --epochs 300  --lr 9e-4 --weight-decay 0.0125 --clip-grad 0.025  --clip-mode 'norm' --min-lr 9e-5 --distillation-type soft --teacher-model 'CascadedViT_L' --teacher-path path/to/cascadedvit_l.pth --mixup 0.1 --cutmix 0.1 --distillation-alpha 0.5 --distillation-tau 2.0
 ```
 </details>
 
@@ -130,7 +130,7 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_
 <summary>CascadedViT_M</summary>
 
 ```
-python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_env main.py --model CascadedViT_M --batch-size 3072 --num_workers 48 --data-path path/to/ImageNet --output_dir path/to/save/checkpoints --epochs 300  --lr 9e-4 --weight-decay 0.0125 --clip-grad 0.025  --clip-mode 'norm' --min-lr 9e-5 --distillation-type soft --teacher-model 'CascadedViT_L' --teacher-path path/to/CascadedViT_L.pth --mixup 0.1 --cutmix 0.1 --distillation-alpha 0.5 --distillation-tau 2.0
+python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_env main.py --model CascadedViT_M --batch-size 3072 --num_workers 48 --data-path path/to/ImageNet --output_dir path/to/save/checkpoints --epochs 300  --lr 9e-4 --weight-decay 0.0125 --clip-grad 0.025  --clip-mode 'norm' --min-lr 9e-5 --distillation-type soft --teacher-model 'CascadedViT_L' --teacher-path path/to/cascadedvit_l.pth --mixup 0.1 --cutmix 0.1 --distillation-alpha 0.5 --distillation-tau 2.0
 ```
 </details> 
 
@@ -138,7 +138,7 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_
 <summary>CascadedViT_L</summary>
 
 ```
-python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_env main.py --model CascadedViT_L --batch-size 3072 --num_workers 48 --data-path path/to/ImageNet --output_dir path/to/save/checkpoints --epochs 300  --lr 9e-4 --weight-decay 0.0125 --clip-grad 0.025  --clip-mode 'norm' --min-lr 9e-5 --distillation-type soft --teacher-model 'CascadedViT_XL' --teacher-path path/to/CascadedViT_XL.pth --mixup 0.1 --cutmix 0.1 --distillation-alpha 0.5 --distillation-tau 2.0
+python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_env main.py --model CascadedViT_L --batch-size 3072 --num_workers 48 --data-path path/to/ImageNet --output_dir path/to/save/checkpoints --epochs 300  --lr 9e-4 --weight-decay 0.0125 --clip-grad 0.025  --clip-mode 'norm' --min-lr 9e-5 --distillation-type soft --teacher-model 'CascadedViT_XL' --teacher-path path/to/cascadedvit_xl.pth --mixup 0.1 --cutmix 0.1 --distillation-alpha 0.5 --distillation-tau 2.0
 ```
 </details>
 
@@ -146,11 +146,8 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port 12345 --use_
 Use the below command to evaluate a pre-trained CascadedViT_L on ImageNet-1K with a single GPU:
 
 ```
-python main.py --eval --model CascadedViT_L --resume path/to/CascadedViT_L.pth --data-path path/to/ImageNet
+python main.py --eval --model CascadedViT_L --resume path/to/cascadedvit_l.pth --data-path path/to/ImageNet
 ```
 
 ## Credits
 We express our gratitude to [EfficientViT](https://github.com/microsoft/Cream/tree/main/EfficientViT) for the backbone. We further thank [Swin Transformer](https://github.com/microsoft/swin-transformer), [LeViT](https://github.com/facebookresearch/LeViT), [pytorch-image-models](https://github.com/rwightman/pytorch-image-models) and [PyTorch](https://github.com/pytorch/pytorch) for their superb codebases.
-
-## License
-View our license [here](./LICENSE).
