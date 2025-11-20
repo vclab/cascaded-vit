@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the official repository of [CascadedViT: Cascaded Chunk-FeedForward and Cascaded Group Attention Vision Transformer]() (add author names later)
+This is the official repository of [CascadedViT: Cascaded Chunk-FeedForward and Cascaded Group Attention Vision Transformer](http://arxiv.org/abs/2511.14111) Srivathsan Sivakumar, Faisal Z. Qureshi
 
 CascadedViT uses **Chunk-FFNs with a cascading nature** to produce a family of light-weight, compute-efficient and high-speed vision transformers.
 
@@ -10,7 +10,7 @@ CascadedViT uses **Chunk-FFNs with a cascading nature** to produce a family of l
 
 CascadedViT models consistently achieve top-ranking efficiency on a new metric called Accuracy-Per-FLOP (APF), which quantifies compute efficiency relative to accuracy
 
-![CascadedViT Compute Efficiency](apf_bar_bolded_name.png)
+![CascadedViT Compute Efficiency](apf_bar_with_log.png)
 
 ## Image Classification
 
