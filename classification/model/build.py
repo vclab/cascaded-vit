@@ -130,4 +130,4 @@ def replace_batchnorm(net):
             replace_batchnorm(child)
 
 _checkpoint_url_format = \
-    'https://github.com/xinyuliu-jeffrey/CascadedViT_Model_Zoo/releases/download/v1.0/{}.pth'
+    'https://github.com/vclab/cascaded-vit/releases/tag/v1.0'
