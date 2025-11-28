@@ -54,7 +54,7 @@ CascadedViT_XL = {
 def CascadedViT_S(num_classes=1000, pretrained=False, distillation=False, fuse=False, pretrained_cfg=None, pretrained_cfg_overlay=None, model_cfg=CascadedViT_S):
     model = CascadedViT(num_classes=num_classes, distillation=distillation, **model_cfg)
     if pretrained:
-        pretrained = _checkpoint_url_format.format(pretrained)
+        pretrained = _checkpoint_url_format.format('cascadedvit_s')
         checkpoint = torch.hub.load_state_dict_from_url(
             pretrained, map_location='cpu')
         d = checkpoint['model']
@@ -72,7 +72,7 @@ def CascadedViT_S(num_classes=1000, pretrained=False, distillation=False, fuse=F
 def CascadedViT_M(num_classes=1000, pretrained=False, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_M):
     model = CascadedViT(num_classes=num_classes, distillation=distillation, **model_cfg)
     if pretrained:
-        pretrained = _checkpoint_url_format.format(pretrained)
+        pretrained = _checkpoint_url_format.format('cascadedvit_m')
         checkpoint = torch.hub.load_state_dict_from_url(
             pretrained, map_location='cpu')
         d = checkpoint['model']
@@ -90,7 +90,7 @@ def CascadedViT_M(num_classes=1000, pretrained=False, distillation=False, fuse=F
 def CascadedViT_L(num_classes=1000, pretrained=False, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_L):
     model = CascadedViT(num_classes=num_classes, distillation=distillation, **model_cfg)
     if pretrained:
-        pretrained = _checkpoint_url_format.format(pretrained)
+        pretrained = _checkpoint_url_format.format('cascadedvit_l')
         checkpoint = torch.hub.load_state_dict_from_url(
             pretrained, map_location='cpu')
         d = checkpoint['model']
@@ -107,7 +107,7 @@ def CascadedViT_L(num_classes=1000, pretrained=False, distillation=False, fuse=F
 def CascadedViT_XL(num_classes=1000, pretrained=False, distillation=False, fuse=False, pretrained_cfg=None, model_cfg=CascadedViT_XL):
     model = CascadedViT(num_classes=num_classes, distillation=distillation, **model_cfg)
     if pretrained:
-        pretrained = _checkpoint_url_format.format(pretrained)
+        pretrained = _checkpoint_url_format.format('cascadedvit_xl')
         checkpoint = torch.hub.load_state_dict_from_url(
             pretrained, map_location='cpu')
         d = checkpoint['model']
@@ -130,4 +130,4 @@ def replace_batchnorm(net):
             replace_batchnorm(child)
 
 _checkpoint_url_format = \
-    'https://github.com/vclab/cascaded-vit/releases/tag/v1.0'
+    'https://github.com/vclab/cascaded-vit/releases/download/v1.0/{}.pth'
