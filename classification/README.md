@@ -2,7 +2,7 @@
 
 This document outlines the results and steps to run classification experiments undertaken with ImageNet-1K for Cascaded-ViT. 
 
-<!-- | Model Name         | Top-1 (%) | Params (M) | FLOPs (M) | Throughput<br>(GPU/M4 Pro/RyzenAI) | Energy on M4 Pro  (J/Img) | Weights|
+<!-- | Model Name         | Top-1 (%) | Params (M) | FLOPs (M) | Throughput<br>(GPU/M4 Pro/RyzenAI) | Energy on M4 Pro  (mJ/Img) | Weights|
 |--------------------|-----------|------------|-----------|------------------|---------------------------|---------------------------------|
 | CascadedViT-S      | 62.0      | 1.9        | 67        |  25740/5775/1453 |   471                     | [CascadedViT_S](https://github.com/vclab/cascaded-vit/releases/download/v1.0/CascadedViT_S.pth)       |
 | CascadedViT-M      | 69.9      | 3.5        | 173       |  20464/           |   568                     | [CascadedViT_M](https://github.com/vclab/cascaded-vit/releases/download/v1.0/CascadedViT_M.pth)       |
