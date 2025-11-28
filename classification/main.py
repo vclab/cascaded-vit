@@ -329,7 +329,6 @@ def main(args):
 
     teacher_model = None
     if args.distillation_type != 'none':
-        import validators
         assert args.teacher_path, 'need to specify teacher-path when using distillation'
         print(f"Creating teacher model: {args.teacher_model}")
 
