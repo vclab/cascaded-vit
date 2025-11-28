@@ -1,7 +1,6 @@
 # --------------------------------------------------------
-# Efficient Main (train/validate)
-# Copyright (c) 2022 Microsoft
-# Adapted from LeViT and Swin Transformer
+# Adapted from EfficientViT, LeViT and Swin Transformer
+#   EfficientViT: (https://github.com/microsoft/Cream/tree/main/EfficientViT)
 #   LeViT: (https://github.com/facebookresearch/levit)
 #   Swin: (https://github.com/microsoft/swin-transformer)
 # --------------------------------------------------------
@@ -29,7 +28,8 @@ from data.threeaugment import new_data_aug_generator
 from engine import train_one_epoch, evaluate
 from losses import DistillationLoss
 
-from model import build
+# valid teachers
+from model.build import CascadedViT_L, CascadedViT_XL
 import utils
 
 
@@ -329,20 +329,28 @@ def main(args):
 
     teacher_model = None
     if args.distillation_type != 'none':
+        import validators
         assert args.teacher_path, 'need to specify teacher-path when using distillation'
         print(f"Creating teacher model: {args.teacher_model}")
-        teacher_model = create_model(
-            args.teacher_model,
-            pretrained=False,
-            num_classes=args.nb_classes,
-            global_pool='avg',
-        )
+
         if args.teacher_path.startswith('https'):
+            teacher_model = create_model(
+                args.teacher_model,
+                pretrained=False,
+                num_classes=args.nb_classes,
+                global_pool='avg',
+            )
             checkpoint = torch.hub.load_state_dict_from_url(
                 args.teacher_path, map_location='cpu', check_hash=True)
+        # load CascadedViT teacher from zoo
         else:
-            checkpoint = torch.load(args.teacher_path, map_location='cpu')
-        teacher_model.load_state_dict(checkpoint['model'])
+            if args.teacher_model == 'CascadedViT_XL':
+                teacher_model = CascadedViT_XL(num_classes=args.nb_classes, pretrained=True)
+            elif args.teacher_model == 'CascadedViT_L':
+                teacher_mdoel = CascadedViT_L(num_classes=args.nb_classes, pretrained=True)
+            else:
+                raise ValueError(f"Unknown teacher model: {args.teacher_model}")
+        # teacher_model.load_state_dict(checkpoint['model'], strict=False)
         teacher_model.to(device)
         teacher_model.eval()
 
@@ -444,7 +452,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        'Cascaded-ViT Maining and evaluation script', parents=[get_args_parser()])
+        'Cascaded-ViT Training and evaluation script', parents=[get_args_parser()])
     args = parser.parse_args()
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
