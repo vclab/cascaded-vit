@@ -11,10 +11,10 @@ This document outlines the results and steps to run classification experiments u
 
 | Model Name     | Top-1 (%) | Params (M) | FLOPs (M) | Throughput (img/s)<br>GPU / M4 Pro / RyzenAI | Energy (J/Img)<br>on M4 Pro | Weights |
 |----------------|-----------|------------|-----------|----------------------------------------------|------------------------------|---------|
-| CascadedViT-S  | 62.0      | 1.9        | 67        | 25740 / 5775 / 1453                          | 471                          | [cascadedvit_s](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_s.pth) |
-| CascadedViT-M  | 69.9      | 3.5        | 173       | 20464 / 3717 / 867                           | 568                          | [cascadedvit_m](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_m.pth) |
-| CascadedViT-L  | 73.0      | 7.0        | 249       | 17335 / 2978 / 667                           | 588                          | [cascadedvit_l](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_l.pth) |
-| CascadedViT-XL | 75.5      | 9.8        | 366       | 11934 / 1910 / 423                           | 653                          | [cascadedvit_xl](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_xl.pth) |
+| CascadedViT-S  | 62.0      | 1.9        | 67        | 25740 / 5775 / 1453                          | 471                          | [pth](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_s.pth)/[CoreML](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_s.mlpackage.zip) |
+| CascadedViT-M  | 69.9      | 3.5        | 173       | 20464 / 3717 / 867                           | 568                          | [pth](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_m.pth)/[CoreML](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_m.mlpackage.zip) |
+| CascadedViT-L  | 73.0      | 7.0        | 249       | 17335 / 2978 / 667                           | 588                          | [pth](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_l.pth)/[CoreML](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_l.mlpackage.zip) |
+| CascadedViT-XL | 75.5      | 9.8        | 366       | 11934 / 1910 / 423                           | 653                          | [pth](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_xl.pth)/[CoreML](https://github.com/vclab/cascaded-vit/releases/download/v1.0/cascadedvit_xl.mlpackage.zip) |
 
 ## Requirements 
 
