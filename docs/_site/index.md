@@ -13,4 +13,10 @@ CViT achieves lower memory and energy consumption compared to size-equivalent Ef
 
 The models are also deployable on AMD's RyzenAI chips in addition to Apple devices. 
 
+
+### Accuracy Per Flop
+Following [Green AI principles](https://dl.acm.org/doi/abs/10.1145/3381831), we defined a custom metric that quantifies accuracy gained per MFLOP. Experiments based on this metric show that CascadedViT achieve top-rank efficiency across all sizes. 
+
+![apf_graph](assets/apf_bar_with_log.png)
+
 Download our pretrained weights from [here](https://github.com/vclab/cascaded-vit/tree/main/classification)
