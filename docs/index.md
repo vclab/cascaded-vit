@@ -19,4 +19,4 @@ Following [Green AI principles](https://dl.acm.org/doi/abs/10.1145/3381831), we 
 
 ![apf_graph](assets/apf_bar_with_log.png)
 
-Download our pretrained weights from [here](https://github.com/vclab/cascaded-vit/tree/main/classification)
+Download our pretrained weights from our [model zoo](https://github.com/vclab/cascaded-vit/releases/tag/v1.0)
