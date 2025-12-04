@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Energy and Memory Efficient Vision Transformers | [“Cascaded-ViT”]</title>
+<meta name="generator" content="Jekyll v3.9.5" />
+<meta property="og:title" content="Energy and Memory Efficient Vision Transformers" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Cascaded Chunk-FeedForward and Cascaded Group Attention Vision Transformer Srivathsan Sivakumar, Faisal Z. Qureshi" />
+<meta property="og:description" content="Cascaded Chunk-FeedForward and Cascaded Group Attention Vision Transformer Srivathsan Sivakumar, Faisal Z. Qureshi" />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="[“Cascaded-ViT”]" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Energy and Memory Efficient Vision Transformers" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"Cascaded Chunk-FeedForward and Cascaded Group Attention Vision Transformer Srivathsan Sivakumar, Faisal Z. Qureshi","headline":"Energy and Memory Efficient Vision Transformers","name":"[“Cascaded-ViT”]","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=7596f701495687ef3e6fff5fdff0b4bf18375237">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">Cascaded-ViT</a></h1>
+
+        
+
+        <p>Cascaded Chunk-FeedForward and Cascaded Group Attention Vision Transformer <br><br>
+Srivathsan Sivakumar, Faisal Z. Qureshi
+</p>
+
+        <!-- 
+        <p class="view"><a href="https://github.com/vclab/cascaded-vit">View the Project on GitHub <small>vclab/cascaded-vit</small></a></p>
+         -->
+
+        
+
+        
+        <ul class="downloads">
+          <li><a href="https://arxiv.org/abs/2511.14111">View On<strong>arxiv</strong></a></li>
+          <li><a href="https://github.com/vclab/cascaded-vit">View On <strong>GitHub</strong></a></li>
+          <li><a href="https://vclab.ca">Check Out <strong>VCLab</strong></a></li>
+        </ul>
+        
+      </header>
+      <section>
+
+      <h1 id="energy-and-memory-efficient-vision-transformers">Energy and Memory Efficient Vision Transformers</h1>
+
+<p>Cascaded-ViT (CViT) is a resource-efficient ViT, explicitly optimized for energy and memory consumption. The architecture uses <strong>Chunk-FFNs with a cascading nature</strong> to produce a family of light-weight, compute-efficient and high-speed vision transformers.</p>
+
+<p>CViT achieves lower memory and energy consumption compared to size-equivalent EfficientViT while maintaining competitive accuracy on ImageNet</p>
+
+<p><img src="assets/live_mem_ieee.png" alt="mem_trace" /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Accuracy (%)</th>
+      <th>Energy (mJ/Img)<br />on M4 Pro</th>
+      <th>Latency (ms/img)<br />on iPhone 15 Pro</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CascadedViT-L</td>
+      <td>73.0</td>
+      <td><strong>588±42</strong></td>
+      <td><strong>0.70</strong></td>
+    </tr>
+    <tr>
+      <td>EfficientViT-M4</td>
+      <td>74.3</td>
+      <td>620±45</td>
+      <td>0.79</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The models are also deployable on AMD’s RyzenAI chips in addition to Apple devices.</p>
+
+<p>Download our pretrained weights from <a href="https://github.com/vclab/cascaded-vit/tree/main/classification">here</a></p>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/vclab">vclab</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>
