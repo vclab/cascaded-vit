@@ -4,11 +4,15 @@ Also include a model loader specified for finetuning EfficientViT
 """
 import io
 import os
+import subprocess
 import time
 from collections import defaultdict, deque
 import datetime
 import math
-
+import onnxruntime
+import torch
+from quark.onnx.quantization.config import Config, get_default_config
+from quark.onnx import ModelQuantizer
 import torch
 import torch.distributed as dist
 from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
@@ -285,16 +289,62 @@ def load_model(modelpath, model):
                     nH2, L2)     
     checkpoint['model'] = state_dict
     return checkpoint
+    
+def get_apu_info():
+    cmd = r'pnputil /enum-devices /bus PCI /deviceids '
+    out = subprocess.check_output(cmd, shell=True).decode()
+    if 'PCI\\VEN_1022&DEV_1502&REV_00' in out:
+        return 'PHX/HPT'
+    if 'PCI\\VEN_1022&DEV_17F0&REV_' in out:
+        return 'STX'
+    return ''
 
-class CosineAnnealingWarmRestartsWithDecay(CosineAnnealingWarmRestarts):
-    def __init__(self, optimizer, T_0, T_mult=1, eta_min=0, warmup_epochs=0, gamma=1.0, last_epoch=-1):
-        # self.warmup_epochs = warmup_epochs
-        self.gamma = gamma
-        self.base_max_lr = optimizer.param_groups[0]['lr']
-        super().__init__(optimizer, last_epoch)
+def set_environment_variable(apu_type):
+    install_dir = os.environ['RYZEN_AI_INSTALLATION_PATH']
+    if apu_type == 'PHX/HPT':
+        os.environ['XLNX_VART_FIRMWARE'] = os.path.join(
+            install_dir, 'voe-4.0-win_amd64', 'xclbins', 'phoenix', '1x4.xclbin')
+        os.environ['NUM_OF_DPU_RUNNERS'] = '1'
+        os.environ['XLNX_TARGET_NAME']   = 'AMD_AIE2_Nx4_Overlay'
+    elif apu_type == 'STX':
+        os.environ['XLNX_VART_FIRMWARE'] = os.path.join(
+            install_dir, 'voe-4.0-win_amd64', 'xclbins', 'strix', 'AMD_AIE2P_Nx4_Overlay.xclbin')
+        os.environ['NUM_OF_DPU_RUNNERS'] = '1'
+        os.environ['XLNX_TARGET_NAME']   = 'AMD_AIE2_Nx4_Overlay'
+    else:
+        raise RuntimeError("Unrecognized APU type")
 
-    def get_lr(self):
-        cycle = self.cycle
-        max_lr = [base_lr * (self.gamma ** cycle) for base_lr in self.base_max_lr]
-        return [self.eta_min + (max_lr - self.eta_min) *
-                (1 + math.cos(math.pi * self.T_cur / self.T_i)) / 2]
+def export_to_onnx(model, model_name):
+    random_inputs = torch.randn(1, 3, 224, 224) # batch size, channels, height, width
+
+    input_names = ['input']
+    output_names = ['output']
+    dynamic_axes = {'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
+    tmp_model_path = str(model_name+".onnx")
+    torch.onnx.export(
+        model,
+        random_inputs,
+        tmp_model_path,
+        export_params=True,
+        opset_version=13,
+        input_names=input_names,
+        output_names=output_names,
+        dynamic_axes=dynamic_axes,
+    )
+
+    print("Model exported to ONNX format!")
+
+def quantize_with_quark(fp32_path, int8_path):
+    # XINT8: symmetric INT8 weights+activations with power-of-two scales
+    quant_cfg = get_default_config("INT8_TRANSFORMER_DEFAULT")
+    quant_cfg.extra_options["UseRandomData"] = True
+    cfg = Config(global_quant_config=quant_cfg)
+    print("Quantization config:", cfg)
+    
+    quantizer = ModelQuantizer(cfg)
+    quantizer.quantize_model(
+        model_input=fp32_path,
+        model_output=int8_path+"_int8.onnx",
+        calibration_data_path=None,  # or point to real data folder
+    )
+    print(f"Quantized model saved to {int8_path}")
