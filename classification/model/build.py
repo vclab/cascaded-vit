@@ -60,9 +60,12 @@ def CascadedViT_S(num_classes=1000, pretrained=False, distillation=False, fuse=F
         d = checkpoint['model']
         D = model.state_dict()
         for k in d.keys():
+            # skip distillation keys
+            if "head_dist" in k:
+                continue
             if D[k].shape != d[k].shape:
                 d[k] = d[k][:, :, None, None]
-        model.load_state_dict(d)
+        model.load_state_dict(d, strict=False) 
     if fuse:
         replace_batchnorm(model)
     return model
@@ -78,9 +81,11 @@ def CascadedViT_M(num_classes=1000, pretrained=False, distillation=False, fuse=F
         d = checkpoint['model']
         D = model.state_dict()
         for k in d.keys():
+            if "head_dist" in k:
+                continue
             if D[k].shape != d[k].shape:
                 d[k] = d[k][:, :, None, None]
-        model.load_state_dict(d)
+        model.load_state_dict(d, strict=False)
     if fuse:
         replace_batchnorm(model)
     return model
@@ -96,9 +101,11 @@ def CascadedViT_L(num_classes=1000, pretrained=False, distillation=False, fuse=F
         d = checkpoint['model']
         D = model.state_dict()
         for k in d.keys():
+            if "head_dist" in k:
+                continue
             if D[k].shape != d[k].shape:
                 d[k] = d[k][:, :, None, None]
-        model.load_state_dict(d)
+        model.load_state_dict(d, strict=False)
     if fuse:
         replace_batchnorm(model)
     return model
@@ -113,9 +120,11 @@ def CascadedViT_XL(num_classes=1000, pretrained=False, distillation=False, fuse=
         d = checkpoint['model']
         D = model.state_dict()
         for k in d.keys():
+            if "head_dist" in k:
+                continue
             if D[k].shape != d[k].shape:
                 d[k] = d[k][:, :, None, None]
-        model.load_state_dict(d)
+        model.load_state_dict(d, strict=False)
     if fuse:
         replace_batchnorm(model)
     return model
